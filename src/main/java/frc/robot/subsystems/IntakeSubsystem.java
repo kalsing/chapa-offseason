@@ -4,13 +4,15 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
 
  
   private final SparkMax motorIntake = new SparkMax(2, MotorType.kBrushless);
-  private final DigitalInput buttonLimit = new DigitalInput(0);
+  private final DigitalInput buttonLimit = new DigitalInput(1);
+
 
  
   public static boolean isAtShootPosition = false;
@@ -41,6 +43,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    SmartDashboard.putBoolean("Limit Switch", buttonLimit.get());
    
     if (buttonLimit.get()) {
       isAtShootPosition = true;

@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -31,14 +32,22 @@ public class RobotContainer {
     new Trigger(controller::getAButton)
     .onTrue(Commands.sequence(
     Commands.run(() -> intakeSubsystem.runIntake(), intakeSubsystem)
+    .until(() -> intakeSubsystem.isLimitReached())
+    .andThen(() -> intakeSubsystem.stopIntake()),
     
-    .withTimeout(3),
-   
-    new WaitUntilCommand(() -> intakeSubsystem.isLimitReached()),
+   Commands.run(() -> shooterSubsystem.runShooter(), shooterSubsystem),
 
-   Commands.run(() -> shooterSubsystem.runShooter(), shooterSubsystem)
+   Commands.waitSeconds(1),
+   new InstantCommand(() -> shooterSubsystem.stopShooter())));
 
-    .withTimeout(2)));
+   new Trigger(controller::getAButton)
+   .onTrue(new InstantCommand(() -> {
+    shooterSubsystem.stopShooter();
+    intakeSubsystem.stopIntake();
+   }));
+
+
+
 
 
   }
