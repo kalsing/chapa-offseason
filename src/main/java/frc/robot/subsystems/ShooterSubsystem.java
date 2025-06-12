@@ -18,7 +18,7 @@ public ShooterSubsystem(){}
 
 
 public void runShooter(){
-motorShoot.set(0.5);
+motorShoot.set(0.3);
    }
 
 public void stopShooter(){

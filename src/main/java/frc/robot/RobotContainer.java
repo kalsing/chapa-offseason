@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -30,25 +31,27 @@ public class RobotContainer {
 
   private void configureBindings() {
     new Trigger(controller::getAButton)
-    .onTrue(Commands.sequence(
-    Commands.run(() -> intakeSubsystem.runIntake(), intakeSubsystem)
-    .until(() -> intakeSubsystem.isLimitReached())
-    .andThen(() -> intakeSubsystem.stopIntake()),
-    
-   Commands.run(() -> shooterSubsystem.runShooter(), shooterSubsystem),
+        .onTrue(Commands.sequence(
+            Commands.run(() -> intakeSubsystem.runIntake(), intakeSubsystem)
+                .until(() -> intakeSubsystem.isLimitReached())
+                .andThen(() -> intakeSubsystem.stopIntake()),
 
-   Commands.waitSeconds(1),
-   new InstantCommand(() -> shooterSubsystem.stopShooter())));
+            Commands.run(() -> shooterSubsystem.runShooter(), shooterSubsystem)
+            .withTimeout(1),
 
-   new Trigger(controller::getAButton)
-   .onTrue(new InstantCommand(() -> {
-    shooterSubsystem.stopShooter();
-    intakeSubsystem.stopIntake();
-   }));
+            new InstantCommand(() -> shooterSubsystem.stopShooter())));
+
+    new Trigger(controller::getBButton)
+        .onTrue(new InstantCommand(() -> {
+            CommandScheduler.getInstance().cancelAll();
+            shooterSubsystem.stopShooter();
+            intakeSubsystem.stopIntake();
+        }));
+}
+
 
 
 
 
 
   }
-}
