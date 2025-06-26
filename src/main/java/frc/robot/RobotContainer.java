@@ -38,15 +38,13 @@ public class RobotContainer {
 
             Commands.run(() -> shooterSubsystem.runShooter(), shooterSubsystem)
             .withTimeout(1),
-
             new InstantCommand(() -> shooterSubsystem.stopShooter())));
 
     new Trigger(controller::getBButton)
         .onTrue(new InstantCommand(() -> {
             CommandScheduler.getInstance().cancelAll();
             shooterSubsystem.stopShooter();
-            intakeSubsystem.stopIntake();
-        }));
+            intakeSubsystem.stopIntake();}));
 }
 
 
