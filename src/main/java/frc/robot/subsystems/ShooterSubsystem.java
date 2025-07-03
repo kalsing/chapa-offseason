@@ -2,8 +2,15 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.RPM;
 
+import java.util.Currency;
+
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -12,43 +19,47 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ShooterSubsystem extends SubsystemBase {
    
-SparkMax motorShoot = new SparkMax(1, MotorType.kBrushless);
+   SparkMax motorShoot = new SparkMax(1, MotorType.kBrushless);
 RelativeEncoder encoder = motorShoot.getEncoder();
-double targetRPM = 1000;
-double currentRPM = encoder.getVelocity();
-double kP = 0.1;
-double kI = 0.0;
+double kP = 0.0004;
+double kI = 0.0000001;
 double kD = 0.0;
-PIDController pid = new PIDController(kP, kI, kD);
+SparkMaxConfig config = new SparkMaxConfig(); 
+boolean atTargetPosition = false;
 public ShooterSubsystem(){
-   pid.setSetpoint(targetRPM);
-   double output = pid.calculate(currentRPM);
+   this.config.closedLoop.pid(kP, kI, kD);
+   this.motorShoot.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 }
 
-   public void runShooter() {
-      double currentRPM = encoder.getVelocity();       // lê o RPM atual
-      double output = pid.calculate(currentRPM);       // calcula a saída PID
-      motorShoot.set(output);                          // aplica ao motor
-
+   public void runShooter() {  
+      motorShoot.getClosedLoopController().setReference(3000, SparkBase.ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
-public void stopShooter(){
+   public void stopShooter(){
     motorShoot.set(0);
-}
+   }
 
 public void periodic(){
    double pos = encoder.getPosition();
    double RPM = encoder.getVelocity();
+   this.setAtTargetPosition();
    SmartDashboard.putNumber("EncoderPosicao", pos);
    SmartDashboard.putNumber("RPM", RPM);
-   SmartDashboard.putBoolean("RPM At target?", atTarget());
+   SmartDashboard.putBoolean("RPM At target?", this.atTargetPosition);
 }
 
-   public boolean atTarget() {
-      return pid.atSetpoint();
+   public void setAtTargetPosition(){
+   this.atTargetPosition = encoder.getVelocity() >= 2500 && encoder.getVelocity() <= 3500;
+  }
+
+  public boolean getAtTargetPosition(){
+   return this.atTargetPosition;
   }
    
 
@@ -56,6 +67,8 @@ public void periodic(){
 public void resetEncoder() {
    encoder.setPosition(0);
 }
+
+
 }
 
 

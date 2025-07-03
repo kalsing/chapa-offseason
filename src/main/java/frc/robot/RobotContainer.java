@@ -27,13 +27,12 @@ public class RobotContainer {
 
     private void configureBindings() {
         new Trigger(controller::getAButton)
-            .onTrue(Commands.sequence(
+            .onTrue(new SequentialCommandGroup(
                 Commands.run(() -> intakeSubsystem.runIntake(), intakeSubsystem)
                     .until(() -> intakeSubsystem.isLimitReached())
                     .andThen(() -> intakeSubsystem.stopIntake()),
 
-                Commands.run(() -> shooterSubsystem.runShooter(), shooterSubsystem)
-                    .withTimeout(5),
+                Commands.run(() -> shooterSubsystem.runShooter(), shooterSubsystem),
 
                 new InstantCommand(() -> shooterSubsystem.stopShooter())
             ));
