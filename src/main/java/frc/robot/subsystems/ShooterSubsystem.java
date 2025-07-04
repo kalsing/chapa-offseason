@@ -13,6 +13,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.XboxController;
@@ -23,19 +24,25 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Logging.EnhancedLoggers.CustomDoubleLogger;
 
 public class ShooterSubsystem extends SubsystemBase {
    
    SparkMax motorShoot = new SparkMax(1, MotorType.kBrushless);
 RelativeEncoder encoder = motorShoot.getEncoder();
-double kP = 0.0004;
-double kI = 0.0000001;
+double kP = 0.0005;
+double kI = 0.000001;
 double kD = 0.0;
 SparkMaxConfig config = new SparkMaxConfig(); 
 boolean atTargetPosition = false;
+CustomDoubleLogger velocity;
+CustomDoubleLogger targetVelocity;
+
 public ShooterSubsystem(){
    this.config.closedLoop.pid(kP, kI, kD);
    this.motorShoot.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+   this.targetVelocity = new CustomDoubleLogger("Target Velocity");
+   this.velocity = new CustomDoubleLogger("Current Velocity");
 }
 
    public void runShooter() {  
@@ -49,6 +56,8 @@ public void periodic(){
    double pos = encoder.getPosition();
    double RPM = encoder.getVelocity();
    this.setAtTargetPosition();
+   this.velocity.append(RPM);
+   this.targetVelocity.append(3000);
    SmartDashboard.putNumber("EncoderPosicao", pos);
    SmartDashboard.putNumber("RPM", RPM);
    SmartDashboard.putBoolean("RPM At target?", this.atTargetPosition);

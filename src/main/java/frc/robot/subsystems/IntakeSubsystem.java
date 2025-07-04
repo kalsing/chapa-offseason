@@ -11,7 +11,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
  
   private final SparkMax motorIntake = new SparkMax(2, MotorType.kBrushless);
-  private final DigitalInput buttonLimit = new DigitalInput(9);
+  private final DigitalInput buttonLimit = new DigitalInput(0);
 
 
  
