@@ -23,19 +23,18 @@ public class RobotContainer {
 
     public RobotContainer() {
         configureBindings();
+        intakeSubsystem.setDefaultCommand(Commands.run(() ->intakeSubsystem.runDefault(), intakeSubsystem));
     }
-
-    private void configureBindings() {
-        new Trigger(controller::getAButton)
-            .onTrue(Commands.sequence(
-                Commands.run(() -> intakeSubsystem.runIntake(), intakeSubsystem)
-                    .until(() -> intakeSubsystem.isLimitReached())
-                    .andThen(() -> intakeSubsystem.stopIntake()),
-
-                Commands.run(() -> shooterSubsystem.runShooter(), shooterSubsystem)
-
-            ));
-
+        private void configureBindings() {
+            new Trigger(controller::getAButton)
+                .onTrue(Commands.sequence(
+                    Commands.run(() -> intakeSubsystem.runIntake(), intakeSubsystem)
+                        .until(() -> intakeSubsystem.isAtIdealCollectState())
+                        .andThen(() -> intakeSubsystem.stopIntake()),
+        
+                    Commands.run(() -> shooterSubsystem.runShooter(), shooterSubsystem)
+                ));
+    
         new Trigger(controller::getBButton)
             .onTrue(new InstantCommand(() -> {
                 CommandScheduler.getInstance().cancelAll();
@@ -44,8 +43,7 @@ public class RobotContainer {
             }));
 
         new Trigger(controller::getXButton)
-            .onTrue(new InstantCommand(() -> {
-                shooterSubsystem.resetEncoder();
-            }));
+            .onTrue(new SequentialCommandGroup(new InstantCommand(() -> shooterSubsystem.resetEncoder()), 
+                new InstantCommand(() -> intakeSubsystem.resetEncoder(), intakeSubsystem)));
     }
 }

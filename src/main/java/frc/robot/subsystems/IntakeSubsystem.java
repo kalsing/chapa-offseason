@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 
+import static edu.wpi.first.units.Units.RPM;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
@@ -21,25 +23,45 @@ public class IntakeSubsystem extends SubsystemBase {
   private final DigitalInput buttonLimit = new DigitalInput(0);
   RelativeEncoder encoderIntake = motorIntake.getEncoder();
   SparkMaxConfig config = new SparkMaxConfig();
+
+  private double targetPosition;
+  private double targetRPM;
+
+
   double kP = 0.0;
   double kI = 0.0;
   double kD = 0.0;
 
+  double kP1 = 0.01;
+  double kI1 = 0.0;
+  double kD1 = 0.0;
+  double RPMIntake = encoderIntake.getVelocity();
+  double IntakePOS = encoderIntake.getPosition();
+
+
   public boolean isAtIdealCollectState = false;
 
   public IntakeSubsystem() {
-   this.config.closedLoop.pid(kP, kI, kD);
+   this.config.closedLoop
+   .p(kP1, ClosedLoopSlot.kSlot1)
+   .i(kI1, ClosedLoopSlot.kSlot1)
+   .d(kD1, ClosedLoopSlot.kSlot1);
+
+   
    this.motorIntake.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   
   public void runIntake() {
-    motorIntake.getClosedLoopController().setReference(1800, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot0);
-
-
+    targetRPM = 1800;
+    motorIntake.getClosedLoopController().setReference(targetRPM, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot1);
   }
 
-  
+  public void runDefault() {
+    targetPosition = 0;
+    motorIntake.getClosedLoopController().setReference(targetPosition, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot1);
+  }
+
   public void stopIntake() {
     motorIntake.set(0);
   }
@@ -49,10 +71,17 @@ public class IntakeSubsystem extends SubsystemBase {
     return buttonLimit.get();
   }
 
-
-  public static boolean isAtIdealCollectState() {
-    return isAtIdealCollectState();
+  public boolean isAtIdealCollectState() {
+    if
+      (RPMIntake > 1760 && RPMIntake <1840){
+      return true;
+    } else {
+      return false;
   }
+}
+public void resetEncoder() {
+  encoderIntake.setPosition(0);
+}
 
   @Override
   public void periodic() {
