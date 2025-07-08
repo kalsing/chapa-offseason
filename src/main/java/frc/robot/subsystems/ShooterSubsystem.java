@@ -27,13 +27,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class ShooterSubsystem extends SubsystemBase {
    
    SparkMax motorShoot = new SparkMax(1, MotorType.kBrushless);
-RelativeEncoder encoder = motorShoot.getEncoder();
-double kP = 0.0004;
-double kI = 0.0000001;
-double kD = 0.0;
-SparkMaxConfig config = new SparkMaxConfig(); 
-boolean atTargetPosition = false;
-public ShooterSubsystem(){
+   RelativeEncoder encoderShooter = motorShoot.getEncoder();
+   double kP = 0.0004;
+   double kI = 0.0000001;
+   double kD = 0.0;
+   SparkMaxConfig config = new SparkMaxConfig(); 
+   boolean atTargetPosition = false;
+
+   public ShooterSubsystem(){
    this.config.closedLoop.pid(kP, kI, kD);
    this.motorShoot.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
 }
@@ -42,12 +43,12 @@ public ShooterSubsystem(){
       motorShoot.getClosedLoopController().setReference(3000, SparkBase.ControlType.kVelocity, ClosedLoopSlot.kSlot0);
   }
    public void stopShooter(){
-    motorShoot.set(0);
+      motorShoot.set(0);
    }
 
 public void periodic(){
-   double pos = encoder.getPosition();
-   double RPM = encoder.getVelocity();
+   double pos = encoderShooter.getPosition();
+   double RPM = encoderShooter.getVelocity();
    this.setAtTargetPosition();
    SmartDashboard.putNumber("EncoderPosicao", pos);
    SmartDashboard.putNumber("RPM", RPM);
@@ -55,17 +56,17 @@ public void periodic(){
 }
 
    public void setAtTargetPosition(){
-   this.atTargetPosition = encoder.getVelocity() >= 2500 && encoder.getVelocity() <= 3500;
+      this.atTargetPosition = encoderShooter.getVelocity() >= 2950 && encoderShooter.getVelocity() <= 3500;
   }
 
   public boolean getAtTargetPosition(){
-   return this.atTargetPosition;
+      return this.atTargetPosition;
   }
    
 
 
 public void resetEncoder() {
-   encoder.setPosition(0);
+   encoderShooter.setPosition(0);
 }
 
 
