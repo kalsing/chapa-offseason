@@ -30,10 +30,11 @@ public class IntakeSubsystem extends SubsystemBase {
   double kI1 = 0.000001;
   double kD1 = 0.0;
   double RPMIntake = encoderIntake.getVelocity();
-  double POSIntake = encoderIntake.getPosition();
+
+  double POSIntake = motorIntake.getEncoder().getPosition();
 
 
-  public boolean atTargetRPM;
+  public boolean atTargetRPM = false;
 
   public IntakeSubsystem() {
    this.config.closedLoop
@@ -47,8 +48,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   
   public void runIntake() {
-    targetRPM = 1800;
-    motorIntake.getClosedLoopController().setReference(targetRPM, SparkBase.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+    motorIntake.getClosedLoopController().setReference(1800, SparkBase.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
   }
 
   public void stopIntake() {
@@ -57,7 +57,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   
   public boolean isLimitReached() {
-    return buttonLimit.get();
+    return true;
   }
   
   public void setAtTargetRPM(){
@@ -72,11 +72,12 @@ public void resetEncoder() {
   encoderIntake.setPosition(0);
 }
 
+
   @Override
   public void periodic() {
     double RPMIntake = encoderIntake.getVelocity();
     double POSIntake = encoderIntake.getPosition();
-    getAtTargetRPM();
+    setAtTargetRPM();
     SmartDashboard.putNumber("Position Intake", POSIntake);
     SmartDashboard.putBoolean("Target RPM?", atTargetRPM);
     SmartDashboard.putNumber("RPM", encoderIntake.getVelocity());
