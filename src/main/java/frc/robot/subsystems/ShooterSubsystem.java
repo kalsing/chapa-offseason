@@ -50,9 +50,7 @@ public void periodic(){
    double pos = encoderShooter.getPosition();
    double RPM = encoderShooter.getVelocity();
    this.setAtTargetPosition();
-   SmartDashboard.putNumber("EncoderPosicao", pos);
-   SmartDashboard.putNumber("RPM", RPM);
-   SmartDashboard.putBoolean("RPM At target?", this.atTargetPosition);
+
 }
 
    public void setAtTargetPosition(){

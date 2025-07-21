@@ -24,22 +24,16 @@ public class IntakeSubsystem extends SubsystemBase {
   RelativeEncoder encoderIntake = motorIntake.getEncoder();
   SparkMaxConfig config = new SparkMaxConfig();
 
-  private double targetPosition;
   private double targetRPM;
 
-
-  double kP = 0.0;
-  double kI = 0.0;
-  double kD = 0.0;
-
-  double kP1 = 0.01;
-  double kI1 = 0.0;
+  double kP1 = 0.00002;
+  double kI1 = 0.000001;
   double kD1 = 0.0;
   double RPMIntake = encoderIntake.getVelocity();
-  double IntakePOS = encoderIntake.getPosition();
+  double POSIntake = encoderIntake.getPosition();
 
 
-  public boolean isAtIdealCollectState = false;
+  public boolean atTargetRPM;
 
   public IntakeSubsystem() {
    this.config.closedLoop
@@ -54,12 +48,7 @@ public class IntakeSubsystem extends SubsystemBase {
   
   public void runIntake() {
     targetRPM = 1800;
-    motorIntake.getClosedLoopController().setReference(targetRPM, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot1);
-  }
-
-  public void runDefault() {
-    targetPosition = 0;
-    motorIntake.getClosedLoopController().setReference(targetPosition, SparkBase.ControlType.kPosition, ClosedLoopSlot.kSlot1);
+    motorIntake.getClosedLoopController().setReference(targetRPM, SparkBase.ControlType.kVelocity, ClosedLoopSlot.kSlot1);
   }
 
   public void stopIntake() {
@@ -70,15 +59,15 @@ public class IntakeSubsystem extends SubsystemBase {
   public boolean isLimitReached() {
     return buttonLimit.get();
   }
-
-  public boolean isAtIdealCollectState() {
-    if
-      (RPMIntake > 1760 && RPMIntake <1840){
-      return true;
-    } else {
-      return false;
-  }
+  
+  public void setAtTargetRPM(){
+    atTargetRPM  = RPMIntake >= 1700 && RPMIntake <=1900;
 }
+
+public boolean getAtTargetRPM(){
+  return atTargetRPM;
+}
+
 public void resetEncoder() {
   encoderIntake.setPosition(0);
 }
@@ -86,11 +75,10 @@ public void resetEncoder() {
   @Override
   public void periodic() {
     double RPMIntake = encoderIntake.getVelocity();
-    double IntakePOS = encoderIntake.getPosition();
-
-    SmartDashboard.putBoolean("Limit Switch", buttonLimit.get());
-    SmartDashboard.putNumber("RPM Intake", RPMIntake);
-    SmartDashboard.putNumber("Position Intake", IntakePOS);
-    SmartDashboard.putBoolean("Pode coletar?", isAtIdealCollectState);
+    double POSIntake = encoderIntake.getPosition();
+    getAtTargetRPM();
+    SmartDashboard.putNumber("Position Intake", POSIntake);
+    SmartDashboard.putBoolean("Target RPM?", atTargetRPM);
+    SmartDashboard.putNumber("RPM", encoderIntake.getVelocity());
     }
   }

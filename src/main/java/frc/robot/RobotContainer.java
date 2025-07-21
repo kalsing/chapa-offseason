@@ -23,16 +23,12 @@ public class RobotContainer {
 
     public RobotContainer() {
         configureBindings();
-        intakeSubsystem.setDefaultCommand(Commands.run(() ->intakeSubsystem.runDefault(), intakeSubsystem));
     }
         private void configureBindings() {
             new Trigger(controller::getAButton)
                 .onTrue(Commands.sequence(
                     Commands.run(() -> intakeSubsystem.runIntake(), intakeSubsystem)
-                        .until(() -> intakeSubsystem.isAtIdealCollectState())
-                        .andThen(() -> intakeSubsystem.stopIntake()),
         
-                    Commands.run(() -> shooterSubsystem.runShooter(), shooterSubsystem)
                 ));
     
         new Trigger(controller::getBButton)
