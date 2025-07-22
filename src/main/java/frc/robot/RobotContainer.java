@@ -28,6 +28,8 @@ public class RobotContainer {
             new Trigger(controller::getAButton)
                 .onTrue(Commands.sequence(
                     Commands.run(() -> intakeSubsystem.runIntake(), intakeSubsystem)
+                    .until(() -> intakeSubsystem.isAtIdealCollectState)
+                    .andThen(() -> intakeSubsystem.stopIntake(), intakeSubsystem)
         
                 ));
     

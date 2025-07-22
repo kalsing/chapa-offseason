@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.RPM;
 
+import java.nio.file.attribute.PosixFileAttributeView;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
@@ -16,7 +18,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class IntakeSubsystem extends SubsystemBase {
+  public class IntakeSubsystem extends SubsystemBase {
 
  
   private final SparkMax motorIntake = new SparkMax(2, MotorType.kBrushless);
@@ -24,18 +26,16 @@ public class IntakeSubsystem extends SubsystemBase {
   RelativeEncoder encoderIntake = motorIntake.getEncoder();
   SparkMaxConfig config = new SparkMaxConfig();
 
-  private double targetRPM;
 
   double kP1 = 0.00002;
   double kI1 = 0.000001;
   double kD1 = 0.0;
-  double RPMIntake = encoderIntake.getVelocity();
 
-  double POSIntake = motorIntake.getEncoder().getPosition();
-
-
+  
   public boolean atTargetRPM = false;
-
+  public boolean IsLimitReached = false;
+  public boolean isAtIdealCollectState = false;
+  
   public IntakeSubsystem() {
    this.config.closedLoop
    .p(kP1, ClosedLoopSlot.kSlot1)
@@ -56,30 +56,48 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   
-  public boolean isLimitReached() {
-    return true;
+  public void setIsLimitReached() {
+    double POSIntake = motorIntake.getEncoder().getPosition();
+    IsLimitReached  = POSIntake >= 95 && POSIntake <=105;
   }
-  
+  public boolean getIsLimitReached(){
+    return IsLimitReached;
+    }
+
+    public void setIsAtIdealCollectState(){
+    isAtIdealCollectState = getAtTargetRPM() && getIsLimitReached();
+    }
+
+    public boolean getIsAtIdealCollectState(){
+      return isAtIdealCollectState;
+    }
+
+
   public void setAtTargetRPM(){
+    double RPMIntake = encoderIntake.getVelocity();
     atTargetRPM  = RPMIntake >= 1700 && RPMIntake <=1900;
-}
+  }
 
-public boolean getAtTargetRPM(){
+  public boolean getAtTargetRPM(){
   return atTargetRPM;
-}
+  }
 
-public void resetEncoder() {
+  
+
+  public void resetEncoder() {
   encoderIntake.setPosition(0);
-}
+  }
 
 
   @Override
   public void periodic() {
-    double RPMIntake = encoderIntake.getVelocity();
-    double POSIntake = encoderIntake.getPosition();
     setAtTargetRPM();
-    SmartDashboard.putNumber("Position Intake", POSIntake);
+    setIsAtIdealCollectState();
+    setIsLimitReached();
+    SmartDashboard.putNumber("CurrentRPM", encoderIntake.getVelocity());
+    SmartDashboard.putNumber("position", encoderIntake.getPosition());
+    SmartDashboard.putBoolean("is at position", IsLimitReached);
+    SmartDashboard.putBoolean("ideal?", isAtIdealCollectState);
     SmartDashboard.putBoolean("Target RPM?", atTargetRPM);
-    SmartDashboard.putNumber("RPM", encoderIntake.getVelocity());
     }
   }
