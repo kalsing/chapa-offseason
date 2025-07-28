@@ -29,8 +29,8 @@ public class ClimberIntake extends SubsystemBase {
    SparkMax motorClimberIntake = new SparkMax(1, MotorType.kBrushless);
    RelativeEncoder encoderClimberIntake = motorClimberIntake.getEncoder();
    private final DigitalInput IntakeCage = new DigitalInput(0);
-   double kP = 0.0003;
-   double kI = 0.0000001;
+   double kP = 0.0004;
+   double kI = 0.0000006;
    double kD = 0.0;
    SparkMaxConfig config = new SparkMaxConfig(); 
    boolean atTargetRPM = false;

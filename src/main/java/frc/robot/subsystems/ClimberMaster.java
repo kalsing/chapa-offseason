@@ -26,8 +26,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
   SparkMaxConfig config = new SparkMaxConfig();
 
 
-  double kP1 = 0.001;
-  double kI1 = 0.0000004;
+  double kP1 = 0.005;
+  double kI1 = 0.0000015;
   double kD1 = 0.0;
 
   public boolean IsAtFirstStageTarget = false;
