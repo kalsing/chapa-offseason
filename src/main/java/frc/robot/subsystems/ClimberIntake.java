@@ -29,11 +29,12 @@ public class ClimberIntake extends SubsystemBase {
    SparkMax motorClimberIntake = new SparkMax(1, MotorType.kBrushless);
    RelativeEncoder encoderClimberIntake = motorClimberIntake.getEncoder();
    private final DigitalInput IntakeCage = new DigitalInput(0);
-   double kP = 0.0004;
+   double kP = 0.0003;
    double kI = 0.0000001;
    double kD = 0.0;
    SparkMaxConfig config = new SparkMaxConfig(); 
    boolean atTargetRPM = false;
+   boolean atIdealCondition = false;
 
    public ClimberIntake(){
    this.config.closedLoop.pid(kP, kI, kD);
@@ -49,8 +50,11 @@ public class ClimberIntake extends SubsystemBase {
 
 public void periodic(){
    setAtTargetRPM();
+   setIsAtIdealCondition();
    SmartDashboard.putNumber("Current RPM", encoderClimberIntake.getVelocity());
    SmartDashboard.putBoolean("Target RPM Reached?", atTargetRPM);
+   SmartDashboard.putBoolean("Ideal Condition", atIdealCondition);
+   SmartDashboard.putBoolean("Digital Input", getIntakeCage());
 }
 
    public void setAtTargetRPM(){
@@ -63,6 +67,14 @@ public void periodic(){
 
   public boolean getIntakeCage(){
    return IntakeCage.get();
+  }
+
+  public void setIsAtIdealCondition(){
+   atIdealCondition = IntakeCage.get() && getAtTargetRPM();
+  }
+
+  public boolean getIsAtIdealCondition(){
+   return atIdealCondition;
   }
    
 

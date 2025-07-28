@@ -19,20 +19,29 @@ public class RobotContainer {
     private final ClimberIntake climberIntake = new ClimberIntake();
 
     private final Joystick joystick = new Joystick(0);
-    private final XboxController controller = new XboxController(0);
+    private final XboxController controller = new XboxController(1);
 
     public RobotContainer() {
         configureBindings();
     }
-        private void configureBindings() {
-            new Trigger(controller::getAButton)
-                .onTrue(Commands.sequence(
-                    Commands.run(() -> climberMaster.runFirstStageClimb(), climberMaster)
-                    .until(() -> climberMaster.getIsAtFirstStageTarget())
-                    .andThen(() -> climberIntake.runClimberIntake())
-                    .until(() -> climberIntake.getIntakeCage())
-                    .andThen(() -> climberMaster.runSecondStageClimb())
-                ));
+    private void configureBindings() {
+        new Trigger(controller::getAButton)
+            .onTrue(Commands.sequence(
+                Commands.run(() -> climberMaster.runFirstStageClimb(), climberMaster)
+                    .until(() -> climberMaster.getIsAtFirstStageTarget()),
+                Commands.runOnce(() -> climberMaster.stopClimber(), climberMaster),
+                Commands.print("terminou o 1"),
+    
+                Commands.run(() -> climberIntake.runClimberIntake(), climberIntake)
+                    .until(() -> climberIntake.getIsAtIdealCondition()),
+                Commands.runOnce(() -> climberIntake.stopClimberIntake(), climberIntake),
+                Commands.print("terminou o 2"),
+    
+                Commands.run(() -> climberMaster.runSecondStageClimb(), climberMaster)
+                    .until(() -> climberMaster.getIsAtSecondStageTarget()),
+                Commands.runOnce(() -> climberMaster.stopClimber(), climberMaster),
+                Commands.print("terminou o 3")
+            ));
     
         new Trigger(controller::getBButton)
             .onTrue(new InstantCommand(() -> {

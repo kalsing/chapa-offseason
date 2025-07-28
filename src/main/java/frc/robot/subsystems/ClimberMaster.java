@@ -22,12 +22,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
  
   private final SparkMax motorClimber = new SparkMax(2, MotorType.kBrushless);
-  RelativeEncoder encoderIntake = motorClimber.getEncoder();
+  RelativeEncoder encoderClimber = motorClimber.getEncoder();
   SparkMaxConfig config = new SparkMaxConfig();
 
 
-  double kP1 = 0.00002;
-  double kI1 = 0.000001;
+  double kP1 = 0.001;
+  double kI1 = 0.0000004;
   double kD1 = 0.0;
 
   public boolean IsAtFirstStageTarget = false;
@@ -52,19 +52,19 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
   }
 
   public void setIsAtFirstStageTarget() {
-    double POSIntake = motorClimber.getEncoder().getPosition();
-    IsAtFirstStageTarget  = POSIntake >= 89 && POSIntake <=91;
+    double POSClimber = motorClimber.getEncoder().getPosition();
+    IsAtFirstStageTarget  = POSClimber >= 88.5 && POSClimber <=91.5;
   }
   public boolean getIsAtFirstStageTarget(){
     return IsAtFirstStageTarget;
     }
 
     public void setIsAtSecondStageTarget() {
-      double POSIntake = motorClimber.getEncoder().getPosition();
-      IsAtSecondStageTarget  = POSIntake >= 179 && POSIntake <=181;
+      double POSClimber = motorClimber.getEncoder().getPosition();
+      IsAtSecondStageTarget  = POSClimber >= 179 && POSClimber <=181;
     }
     public boolean getIsAtSecondStageTarget(){
-      return IsAtFirstStageTarget;
+      return IsAtSecondStageTarget;
       }
 
   public void stopClimber() {
@@ -72,7 +72,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
   }
 
   public void resetEncoder() {
-  encoderIntake.setPosition(0);
+  encoderClimber.setPosition(0);
   }
 
 
@@ -80,8 +80,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
   public void periodic() {
     setIsAtFirstStageTarget();
     setIsAtSecondStageTarget();
-    SmartDashboard.putNumber("CurrentRPM", encoderIntake.getVelocity());
-    SmartDashboard.putNumber("position", encoderIntake.getPosition());
+    SmartDashboard.putNumber("CurrentRPM", encoderClimber.getVelocity());
+    SmartDashboard.putNumber("position", encoderClimber.getPosition());
     SmartDashboard.putBoolean("1st Stage?", IsAtFirstStageTarget);
     SmartDashboard.putBoolean("2nd Stage?", IsAtSecondStageTarget);
     }
