@@ -49,9 +49,5 @@ public class RobotContainer {
                 climberIntake.stopClimberIntake();
                 climberMaster.stopClimber();
             }));
-
-        new Trigger(controller::getXButton)
-            .onTrue(new SequentialCommandGroup(new InstantCommand(() -> climberIntake.resetEncoder()), 
-                new InstantCommand(() -> climberMaster.resetEncoder(), climberMaster)));
+        }
     }
-}
